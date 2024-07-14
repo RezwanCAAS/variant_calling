@@ -16,9 +16,9 @@
 
 module load fastp/0.23.2
 
-SEQDIR='/ibex/scratch/projects/c2141/dragon-fruit/test/'
+SEQDIR='~/test/'
 VAR=($(ls ${SEQDIR}))
-OUTDIR='/ibex/scratch/projects/c2141/dragon-fruit/mapped_reads'
+OUTDIR='~/mapped_reads'
 
 N=${SLURM_ARRAY_TASK_ID}
 
@@ -48,10 +48,10 @@ fastp --in1 ${FASTQ[0]} --in2 ${FASTQ[1]} --out1 ${OUTDIR}${V}_R1_trim.fastq.gz 
 
 module load bwa/0.7.17/gnu-6.4.0 samtools/1.8
 
-SEQDIR='/ibex/scratch/projects/c2141/dragon-fruit/draf_wgs/'
+SEQDIR='~/draf_wgs/'
 VAR=($(ls ${SEQDIR}))
-REF='/ibex/scratch/projects/c2141/tariqr/dragonfruits_sequencing/genome_data/PitayaGenomic.fa'
-OUTDIR='/ibex/scratch/projects/c2141/dragon-fruit/mapping_output/'
+REF='~/genome_data/PitayaGenomic.fa'
+OUTDIR='~/mapping_output/'
 
 N=${SLURM_ARRAY_TASK_ID}
 
@@ -67,7 +67,7 @@ bwa mem -t 32 ${REF} <(zcat ${FASTQ[0]}) <(zcat ${FASTQ[1]}) | samtools sort -o 
 #           the mapped reads           #
 #                                      #
 ########################################
-# After amarkduplication, need to collect the percentage of the duplications. So chekc the supplementary file
+# After amarkduplication, need to collect the percentage of the duplications. So check the supplementary file
 
 #!/bin/bash
 #
@@ -81,9 +81,9 @@ bwa mem -t 32 ${REF} <(zcat ${FASTQ[0]}) <(zcat ${FASTQ[1]}) | samtools sort -o 
 
 module load picard/2.20.4
 
-bam_list=(/ibex/scratch/projects/c2141/dragon-fruit/mapped/*.bam)
+bam_list=(~/mapped/*.bam)
 
-outputdir=(/ibex/scratch/projects/c2141/tariqr/dragonfruits_sequencing/marked/)
+outputdir=(~/marked/)
 
 bam=${bam_list[$SLURM_ARRAY_TASK_ID-1]}
 
@@ -120,10 +120,10 @@ picard -Xmx24G MarkDuplicates I=$bam O=${output}_marked.bam  M=${metrics}_marked
 
 module load gatk/4.1.2.0
 
-bam_dir="/ibex/scratch/projects/c2141/dragon-fruit/markduplicate/"
+bam_dir="~/dragon-fruit/markduplicate/"
 echo "${bam_dir[@]}"
 
-out_dir="/ibex/scratch/projects/c2141/dragon-fruit/add_readgroup/"
+out_dir="~/dragon-fruit/add_readgroup/"
 
 bam_files=(${bam_dir}/*.bam)
 echo "$bam_files"
@@ -148,9 +148,9 @@ gatk AddOrReplaceReadGroups -I ${base} -O ${output}_RG.bam --RGID readgroup1 --R
 
 module load samtools/1.8
 
-bam_list=(/ibex/scratch/projects/c2141/dragon-fruit/add_readgroup/*.bam)
+bam_list=(~/dragon-fruit/add_readgroup/*.bam)
 
-out_dir="/ibex/scratch/projects/c2141/dragon-fruit/add_readgroup/"
+out_dir="~/dragon-fruit/add_readgroup/"
 
 bam_file=${bam_list[$SLURM_ARRAY_TASK_ID-1]}
 
@@ -174,9 +174,9 @@ samtools index ${bam_file}
 
 module load gatk/4.1.2.0
 
-bam_dir=(/ibex/scratch/projects/c2141/dragon-fruit/add_readgroup/*.bam)
+bam_dir=(~/add_readgroup/*.bam)
 
-out_dir="/ibex/scratch/projects/c2141/dragon-fruit/variant_calling/"
+out_dir="`~/variant_calling/"
 
 bam_files=${bam_dir[$SLURM_ARRAY_TASK_ID-1]}
 
@@ -208,7 +208,7 @@ gatk --java-options "-Xmx32g" HaplotypeCaller --native-pair-hmm-threads 20 -R /i
 
 module load gatk/4.1.2.0
 
-ref_dir=(/ibex/scratch/projects/c2141/tariqr/dragonfruits_sequencing/pitaya_genome/PitayaGenomic.fa)
+ref_dir=(~/pitaya_genome/PitayaGenomic.fa)
 
 
 gatk --java-options "-Xmx800g" CombineGVCFs -R ${ref_dir} --variant vcfs.list -O joint_files.g.vcf.gz
@@ -232,9 +232,9 @@ gatk --java-options "-Xmx800g" CombineGVCFs -R ${ref_dir} --variant vcfs.list -O
 
 module load bcftools/1.10.2
 
-bam_dir=(/ibex/scratch/projects/c2141/dragon-fruit/variant_calling/*.g.vcf)
+bam_dir=(~/variant_calling/*.g.vcf)
 
-out_dir="/ibex/scratch/projects/c2141/dragon-fruit/reheading/"
+out_dir="~/reheading/"
 
 bam_files=${bam_dir[$SLURM_ARRAY_TASK_ID-1]}
 
@@ -262,7 +262,7 @@ bcftools reheader --samples <(echo "${base}") ${bam_files} > ${output}
 
 module load gatk/4.1.2.0
 
-ref_dir=(/ibex/scratch/projects/c2141/tariqr/dragonfruits_sequencing/pitaya_genome/PitayaGenomic.fa)
+ref_dir=(~/pitaya_genome/PitayaGenomic.fa)
 
 gatk --java-options "-Xmx800g" GenotypeGVCFs -R ${ref_dir} -V combine_variants.g.vcf.gz -O genotyped.vcf.gz
 
@@ -297,12 +297,9 @@ output_file="variants_summary.txt"
 
 bcftools view -H $input_file | wc -l > $output_file
 
-bcftools view -H /ibex/scratch/projects/c2141/dragon-fruit/reheading/genotyped.vcf.gz | wc -l > /ibex/scratch/projects/c2141/dragon-fruit/reheading/summary_variants.txt
+bcftools view -H ~/genotyped.vcf.gz | wc -l > ~/reheading/summary_variants.txt
 
-#to find the minor allel frequency in unfiltered file
-
-
-
+#to find the minor allele frequency in unfiltered file
 
 #if need to edit the name of the header as per the requirement of the analysis
 
