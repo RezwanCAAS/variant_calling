@@ -569,7 +569,7 @@ plink --vcf $input_file --recode  --const-fid --allow-extra-chr --out $output_fi
 
 
 
-
+#convert the vcf file into hapmap file
 
 #!/bin/bash
 #
@@ -637,7 +637,7 @@ module load plink/1.90b6.24
 plink --file genotyped_hapmap --distance square --out genetic_distance
 
 
-#calulcate the genetic distance for phylogenetic tree
+#calulcate the K values for population structure
 
 #!/bin/bash
 #
